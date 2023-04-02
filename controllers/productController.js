@@ -1,24 +1,15 @@
 import { Router } from 'express';
-// import { validateProductInput } from './helpers/helperProduct.js';
+
 import { productsServer } from '../services/productService.js'
-// import { accessoriesServer } from '../services/accessoryService.js';
+
 // import { isLogin } from '../middlewares/auth.js';
 
 const router = Router();
 
 router.get("/", (req, res) => {
-    productsServer.getAll(req.query)
-        .then((products) => {
-            res.render("home", {
+           res.render("home", {
                 title: "Home",
-                products,
-                query: req.query,
             });
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(500).render("500")
-        });
 })
 
 // router.get("/create", isLogin, (req, res) => {

@@ -1,29 +1,29 @@
 import { Router } from "express";
 import { config } from "../config/config.js";
-// import { isLogin, notLogin } from "../middlewares/auth.js";
+import { isLogin, notLogin } from "../middlewares/auth.js";
 import { authService } from "../services/authService.js";
 
 const router = Router();
 
-router.get('/logout', (req, res) => {
+router.get('/logout', isLogin, (req, res) => {
     res.clearCookie(config.TOKEN_NAME)
         .redirect("/")
 })
 
-router.get('/login', (req, res) => {
+router.get('/login', notLogin, (req, res) => {
     res.render("login", {
         title: "Login"
     })
 })
 
-router.get('/register', (req, res) => {
+router.get('/register', notLogin, (req, res) => {
     res.render("register", {
         title: "Register",
     })
 
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', notLogin, async (req, res) => {
     const { email, password } = req.body
     try {
 
@@ -37,13 +37,13 @@ router.post('/login', async (req, res) => {
 
     } catch (error) {
         res.render("login", {
-            title: "Error Login",
+            title: "Login",
             error
         })
     }
 })
 
-router.post('/register', async (req, res) => {
+router.post('/register', notLogin, async (req, res) => {
     const {
         email,
         username,

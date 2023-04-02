@@ -12,15 +12,16 @@ export function auth() {
                 let verifycode = verify(token, config.SECRET_TOKEN)
                 req.user = verifycode;
                 res.locals.user = verifycode;
-                res.locals.admin = verifycode.admin;
-
             }
             next();
-            
+
         } catch (error) {
             res.clearCookie(config.TOKEN_NAME)
                 .status(401)
-                .render('401')
+                .render("home", {
+                    title: "Home",
+                    error
+                });
         }
 
     }
@@ -28,36 +29,21 @@ export function auth() {
 }
 
 export function isLogin(req, res, next) {
-    if(req.user){
+    if (req.user) {
         next();
-    }else{
-        res.redirect("/auth/login")
+    } else {
+        res.status(403)
+            .render("/auth/login")
     }
 }
 
 export function notLogin(req, res, next) {
-    if(!req.user){
+    if (!req.user) {
         next();
-    }else{
-        res.redirect("/")
+    } else {
+        res.status(404)
+            .render("404")
     }
 }
 
-export function isCreator(req, res, next) {
-    const productId = req.params.productId;
-
-    if(req.user.id === productId){
-        next();
-    }else{
-        res.redirect("/")
-    }
-}
-
-export function isAdmin(req, res, next) {
-    if(req.user.admin){
-        next();
-    }else{
-        res.redirect("/")
-    }
-}
 
