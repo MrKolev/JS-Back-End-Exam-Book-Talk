@@ -5,13 +5,9 @@ function create(data) {
     return cube.save();
 }
 
+
 function getById(id) {
     return Book.findById(id).lean();
-}
-function getByIdWithAccessory(id) {
-    return Book.findById(id)
-        .populate("accessories")
-        .lean();
 }
 
 async function getAllfromCatalog() {
@@ -31,7 +27,6 @@ export const productsServer = {
     create,
     getAllfromCatalog,
     getById,
-    getByIdWithAccessory,
     updateOne,
     deleteOneProduct
 }

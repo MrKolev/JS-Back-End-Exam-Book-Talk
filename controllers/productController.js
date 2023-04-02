@@ -1,7 +1,5 @@
 import { Router } from 'express';
-
 import { productsServer } from '../services/productService.js'
-
 import { isLogin } from '../middlewares/auth.js';
 
 const router = Router();
@@ -12,10 +10,9 @@ router.get("/", (req, res) => {
     });
 })
 
-router.get("/catalog", isLogin, (req, res) => {
+router.get("/catalog", (req, res) => {
     productsServer.getAllfromCatalog()
         .then(books => {
-            console.log(books);
             res.render("catalog", {
                 books
             })
@@ -50,24 +47,18 @@ router.get("/create", isLogin, (req, res) => {
 //     });
 // })
 
-// router.get("/details/:productId", (req, res) => {
-//     productsServer.getByIdWithAccessory(req.params.productId)
-//         .then((products) => {
-//             let isLoading = false;
-//             if (req.user) {
-//                 isLoading = true;
-//             }
-//             products.accessories.forEach(accessory => {
-//                 accessory.productId = req.params.productId;
-//                 accessory.admin = isLoading;
-//             });
-//             res.render("details", {
-//                 title: "Product Details",
-//                 products,
-//                 query: req.query
-//             });
-//         });
-// })
+router.get("/details/:productId", (req, res) => {
+    console.log(req.params.productId);
+    productsServer.getById(req.params.productId)
+        .then((products) => {
+            console.log(products);
+            
+            res.render("details", {
+                title: "Details",
+                products,
+            });
+        });
+})
 
 // router.get("/:productId/delete", isLogin, async (req, res) => {
 //     const product = await productsServer.getById(req.params.productId)
@@ -117,7 +108,7 @@ router.post("/create", isLogin, async (req, res) => {
         res.redirect("/catalog")
     } catch (error) {
         console.log(error);
-                res.status(500).render("404");
+                res.status(404).render("404");
     }
 })
 
