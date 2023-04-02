@@ -36,16 +36,14 @@ router.get("/create", isLogin, (req, res) => {
 //     });
 // })
 
-// router.get("/:productId/edit", isLogin, async (req, res) => {
-//     let product = await productsServer.getById(req.params.productId);
-//     res.render("editCube", {
-//         title: "Edit Cube",
-//         name: true,
-//         description: true,
-//         imageUrl: true,
-//         data: product
-//     });
-// })
+router.get("/edit/:productId", isLogin, async (req, res) => {
+    console.log(req.params.productId);
+    let products= await productsServer.getById(req.params.productId);
+    res.render("edit", {
+        title: "Edit",
+        products
+    });
+})
 
 router.get("/details/:productId", async (req, res) => {
     let products = await productsServer.getById(req.params.productId);
@@ -59,7 +57,12 @@ router.get("/details/:productId", async (req, res) => {
     if (products.owner.toString() == userId) {
         products.isOwner = true;
     }
-    
+
+    if(products.wishingList.includes(userId)){
+        products.isWished = true;
+    }else{
+        products.isWished = false;
+    }
 
     res.render("details", {
         title: "Details",
@@ -120,13 +123,13 @@ router.post("/create", isLogin, async (req, res) => {
     }
 })
 
-// router.post("/:from/:productId/edit", validateProductInput, isLogin, (req, res) => {
-//     productsServer.updateOne(req.params.productId, req.body)
-//         .then(() => res.redirect("/products/details/" + req.params.productId))
-//         .catch((error) => {
-//             console.log(error);
-//             res.status(500).render("500");
-//         });
-// })
+router.post("/edit/:productId",isLogin, (req, res) => {
+    productsServer.updateOne(req.params.productId, req.body)
+        .then(() => res.redirect("/products/details/" + req.params.productId))
+        .catch((error) => {
+            console.log(error);
+            res.status(500).render("500");
+        });
+})
 
 export { router as productController };
