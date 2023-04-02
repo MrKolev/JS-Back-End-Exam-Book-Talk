@@ -27,22 +27,22 @@ async function login(username, password) {
 }
 
 async function userCheck(username) {
-    const user = await User.findOne({ name: username });
+    const user = await User.findOne({ username });
     if (user) throw { message: "Username already exists!" }
 }
 
 async function emailCheck(email) {
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email });
     if (user) throw { message: "Email address is already associated with another user!" }
 }
 
-async function register(name, password, email) {
+async function register(username, password, email) {
 
     let salt = await bcrypt.genSalt(config.SALT_ROUNDS);
     let hash = await bcrypt.hash(password, salt);
 
     const user = new User({
-        name,
+        username,
         password: hash,
         email,
     })

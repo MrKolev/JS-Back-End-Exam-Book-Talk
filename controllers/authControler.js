@@ -1,5 +1,5 @@
 import { Router } from "express";
-// import { config } from "../config/config.js";
+import { config } from "../config/config.js";
 // import { isLogin, notLogin } from "../middlewares/auth.js";
 import { authService } from "../services/authService.js";
 
@@ -56,8 +56,8 @@ router.post('/register', async (req, res) => {
         if (password !== repeatPassword) throw { message: "The passwords do not match." }
         if (!username, !password, !repeatPassword) throw { message: "Please fill in all fields." }
 
-        // await authService.userCheck(username);
-        // await authService.emailCheck(email);
+        await authService.userCheck(username);
+        await authService.emailCheck(email);
 
         let token = await authService.register(username, password, email);
 
