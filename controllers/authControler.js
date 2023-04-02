@@ -10,7 +10,6 @@ const router = Router();
 //         .redirect("/")
 // })
 
-// router.get('/login',notLogin,  (req, res) => {
 router.get('/login', (req, res) => {
     res.render("login", {
         title: "Login"
@@ -24,25 +23,25 @@ router.get('/register', (req, res) => {
 
 })
 
-// router.post('/login', notLogin, async (req, res) => {
-//     const { username, password } = req.body
-//     try {
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body
+    try {
 
-//         if (!username || !password) throw { message: "Fill in all the fields." }
+        if (!email || !password) throw { message: "Fill in all the fields." }
 
-//         let token = await authService.login(username, password);
+        let token = await authService.login(email, password);
 
-//         res.cookie(config.TOKEN_NAME, token);
+        res.cookie(config.TOKEN_NAME, token);
 
-//         res.redirect("/")
+        res.redirect("/")
 
-//     } catch (error) {
-//         res.render("login", {
-//             title: "Error Login",
-//             error
-//         })
-//     }
-// })
+    } catch (error) {
+        res.render("login", {
+            title: "Error Login",
+            error
+        })
+    }
+})
 
 router.post('/register', async (req, res) => {
     const {

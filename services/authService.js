@@ -19,10 +19,10 @@ const token = (user) => {
     return sign(options, config.SECRET_TOKEN)
 }
 
-async function login(username, password) {
-    const user = await User.findOne({ name: username });
-    if (!user) throw { message: "nWrong password or username!" }
-    if (!(await bcrypt.compare(password, user.password))) throw { message: "pWrong password or username!" }
+async function login(email, password) {
+    const user = await User.findOne({ email });
+    if (!user) throw { message: "Wrong password or username!" }
+    if (!(await bcrypt.compare(password, user.password))) throw { message: "Wrong password or username!" }
     return token(user);
 }
 
