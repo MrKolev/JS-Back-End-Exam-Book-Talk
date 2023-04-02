@@ -47,17 +47,25 @@ router.get("/create", isLogin, (req, res) => {
 //     });
 // })
 
-router.get("/details/:productId", (req, res) => {
-    console.log(req.params.productId);
-    productsServer.getById(req.params.productId)
-        .then((products) => {
-            console.log(products);
-            
-            res.render("details", {
-                title: "Details",
-                products,
-            });
-        });
+router.get("/details/:productId", async (req, res) => {
+    let products = await productsServer.getById(req.params.productId);
+
+    let userId = null;
+
+    if (req.user) {
+        userId = req.user._id;
+    }
+
+    if (products.owner.toString() == userId) {
+        products.isOwner = true;
+    }
+    
+
+    res.render("details", {
+        title: "Details",
+        products,
+    });
+
 })
 
 // router.get("/:productId/delete", isLogin, async (req, res) => {
@@ -108,7 +116,7 @@ router.post("/create", isLogin, async (req, res) => {
         res.redirect("/catalog")
     } catch (error) {
         console.log(error);
-                res.status(404).render("404");
+        res.status(404).render("404");
     }
 })
 

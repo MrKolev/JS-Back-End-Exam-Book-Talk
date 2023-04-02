@@ -6,8 +6,8 @@ function create(data) {
 }
 
 
-function getById(id) {
-    return Book.findById(id).lean();
+async function getById(id) {
+    return await Book.findById(id).lean()
 }
 
 async function getAllfromCatalog() {

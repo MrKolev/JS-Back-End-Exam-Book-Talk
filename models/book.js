@@ -1,4 +1,5 @@
 import mongoose, { model, Schema } from "mongoose";
+import { User } from "./uresrs.js";
 
 const bookSchema = new Schema({
 
@@ -35,11 +36,13 @@ const bookSchema = new Schema({
         ref: "User"
     }],
     // •	Owner - object Id (a reference to the User model)
-    owner: [{
+    owner: {
         type: mongoose.Types.ObjectId,
         ref: "User"
-    }]
+    }
 });
+
+User
 
 export const Book = model('Book', bookSchema);
 
