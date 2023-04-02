@@ -5,10 +5,10 @@ import { authService } from "../services/authService.js";
 
 const router = Router();
 
-// router.get('/logout', isLogin, (req, res) => {
-//     res.clearCookie(config.TOKEN_NAME)
-//         .redirect("/")
-// })
+router.get('/logout', (req, res) => {
+    res.clearCookie(config.TOKEN_NAME)
+        .redirect("/")
+})
 
 router.get('/login', (req, res) => {
     res.render("login", {
