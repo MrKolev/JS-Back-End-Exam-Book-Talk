@@ -124,8 +124,9 @@ router.post("/create", isLogin, async (req, res) => {
 })
 
 router.post("/edit/:productId",isLogin, (req, res) => {
+    console.log("OK");
     productsServer.updateOne(req.params.productId, req.body)
-        .then(() => res.redirect("/products/details/" + req.params.productId))
+        .then(() => res.redirect("/details/" + req.params.productId))
         .catch((error) => {
             console.log(error);
             res.status(500).render("500");

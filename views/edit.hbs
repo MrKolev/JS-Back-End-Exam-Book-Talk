@@ -6,18 +6,18 @@
 
     <section class="edit-form-container">
 
-        <form action="">
+        <form action="/edit/{{products._id}}" method="POST">
             <h3>Edit Book Review</h3>
             <label>Title</label>
-            <input type="text" name="" class="box" value="{{products.title}}" id="">
+            <input type="text" name="title" class="box" value="{{products.title}}" id="">
             <label>Author</label>
-            <input type="text" name="" class="box" value="{{products.author}}" id="">
+            <input type="text" name="author" class="box" value="{{products.author}}" id="">
             <label>Genre</label>
-            <input type="text" name="" class="box" value="{{products.genre}}" id="">
+            <input type="text" name="genre" class="box" value="{{products.genre}}" id="">
             <label>Stars</label>
-            <input type="number" name="" class="box" value="{{products.stars}}" id="">
+            <input type="number" name="stars" class="box" value="{{products.stars}}" id="">
             <label>Image</label>
-            <input type="text" name="" class="box" value="{{products.image}}" id="">
+            <input type="text" name="image" class="box" value="{{products.image}}" id="">
             <label>Review</label>
             <textarea class="box"
                 name="">{{products.bookReview}}</textarea>
