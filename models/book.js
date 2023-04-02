@@ -16,7 +16,7 @@ const bookSchema = new Schema({
         required: true,
     },
     bookReview: {
-        type: Number,
+        type: String,
         required: true,
     },
     genre: {

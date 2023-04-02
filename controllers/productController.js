@@ -2,24 +2,31 @@ import { Router } from 'express';
 
 import { productsServer } from '../services/productService.js'
 
-// import { isLogin } from '../middlewares/auth.js';
+import { isLogin } from '../middlewares/auth.js';
 
 const router = Router();
 
 router.get("/", (req, res) => {
-           res.render("home", {
-                title: "Home",
-            });
+    res.render("home", {
+        title: "Home",
+    });
 })
 
-// router.get("/create", isLogin, (req, res) => {
-//     res.render("create", {
-//         title: "Create",
-//         name: true,
-//         description: true,
-//         imageUrl: true
-//     })
-// })
+router.get("/catalog", isLogin, (req, res) => {
+    productsServer.getAllfromCatalog()
+        .then(books => {
+            console.log(books);
+            res.render("catalog", {
+                books
+            })
+        })
+})
+
+router.get("/create", isLogin, (req, res) => {
+    res.render("create", {
+        title: "Create"
+    })
+})
 
 // router.get("/:productId/attach", isLogin, async (req, res) => {
 //     let product = await productsServer.getById(req.params.productId);
@@ -91,14 +98,28 @@ router.get("/", (req, res) => {
 //         });
 // })
 
-// router.post("/:from/create", validateProductInput, isLogin, (req, res) => {
-//     productsServer.create(req.body)
-//         .then(() => res.redirect("/products"))
-//         .catch((error) => {
-//             console.log(error);
-//             res.status(500).render("500");
-//         });
-// })
+router.post("/create", isLogin, async (req, res) => {
+    const { title, author, genre, stars, image, bookReview } = req.body;
+    try {
+        if (!title || !author || !genre || !stars || !image || !bookReview) {
+            throw { message: "Please fill in all fields." };
+        }
+
+        await productsServer.create({
+            title,
+            author,
+            image,
+            bookReview,
+            genre,
+            stars,
+            owner: req.user._id
+        });
+        res.redirect("/catalog")
+    } catch (error) {
+        console.log(error);
+                res.status(500).render("404");
+    }
+})
 
 // router.post("/:from/:productId/edit", validateProductInput, isLogin, (req, res) => {
 //     productsServer.updateOne(req.params.productId, req.body)

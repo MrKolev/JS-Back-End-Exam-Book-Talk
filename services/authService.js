@@ -7,15 +7,9 @@ const { sign } = jwt;
 
 
 const token = (user) => {
-    let options = { _id: user._id }
-    if(user.admin){
-        options.admin = user.admin;
-        options.name = user.name;
-    }
-    if(user.guest){
-        options.guest = user.guest;
-        options.name = user.name;
-    }
+    let options = { _id: user._id,
+    name: user.username}
+    
     return sign(options, config.SECRET_TOKEN)
 }
 

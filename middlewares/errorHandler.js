@@ -1,4 +1,6 @@
 export function errorHandler(err, req, res, next){
-    let status = err.status || 500;
-    let message = err.message || "Something went wrong!"
+    err.status = err.status || 500;
+    err.message = err.message || "Something went wrong!";
+
+    next(err);
 }

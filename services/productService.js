@@ -14,16 +14,8 @@ function getByIdWithAccessory(id) {
         .lean();
 }
 
-async function getAll(query) {
-    let products = null;
-    if (query.from || query.to) {
-        products = await Book.find({ difficultyLevel: { $gte: query.from, $lte: query.to } }).lean();
-    } else {
-        products = await Book.find({}).lean();
-    }
-
-    if (query.search) products = products.filter(x => x.name.includes(query.search))
-    return products
+async function getAllfromCatalog() {
+    return await Book.find({}, { title: 1, image: 1, _id: 1, }).lean();
 }
 
 async function updateOne(productId, data) {
@@ -37,7 +29,7 @@ async function deleteOneProduct(productId) {
 
 export const productsServer = {
     create,
-    getAll,
+    getAllfromCatalog,
     getById,
     getByIdWithAccessory,
     updateOne,
