@@ -71,5 +71,11 @@ router.post('/register', notLogin, async (req, res) => {
     }
 })
 
+router.get('/profile', isLogin, async (req, res) => {
+    const userId = req.user._id;
+    let wished = await authService.getMyWishBook(userId);
+    res.render('profile', { title: 'Profile', wished });
+});
+
 
 export { router as authControler };
