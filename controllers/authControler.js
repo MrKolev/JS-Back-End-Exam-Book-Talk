@@ -18,6 +18,7 @@ router.post('/login', notLogin, async (req, res) => {
     const email = req.body.email.trim();
     try {
         if (!email || !password) throw "Fill in all the fields.";
+        
         const user = await authService.login(email);
         if (!user) throw "Wrong password or username!";
         if (!(await user.validatePassword(password))) throw "Wrong password or username!";
@@ -51,13 +52,12 @@ router.post('/register', notLogin, async (req, res) => {
     try {
         if (!username, !password, !repeatPassword) throw { message: "Please fill in all fields.", errors: [] }
         if (password !== repeatPassword) throw { message: "The passwords do not match.", errors: [] }
-
-        if (authService.userCheck(username)) throw { message: "Username already exists!", errors: [] }
-        if (authService.emailCheck(email)) throw { message: "Email address is already associated with another user!", errors: [] }
+        if (await authService.userCheck(username)) throw { message: "Username already exists!", errors: [] }
+        if (await authService.emailCheck(email)) throw { message: "Email address is already associated with another user!", errors: [] }
 
         const user = await authService.register({ username, password, email });
-        const token = authService.createToken(user);
-        res.cookie(config.TOKEN_NAME, token);
+        
+        res.cookie(config.TOKEN_NAME, user.createToken());
         res.redirect("/");
 
     } catch (error) {
