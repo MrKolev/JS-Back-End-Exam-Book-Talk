@@ -65,24 +65,21 @@ router.get("/details/:productId", async (req, res) => {
 
 })
 
-// router.get("/:productId/delete", isLogin, async (req, res) => {
-//     const product = await productsServer.getById(req.params.productId)
-//     console.log(product);
-//     res.render("deleteCube", {
-//         title: "Delete Cube",
-//         product
-//     });
-// });
+router.get("/delete/:productId", isLogin, async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const userId = req.user._id;
+        if(productsServer.isOwner(userId,productId)){
+            await productsServer.deleteOneProduct(productId);
+        }
 
-// router.post("/:productId/delete", (req, res) => {
-//     productsServer.deleteOneProduct(req.params.productId)
-//         .then(() =>
-//             res.redirect(`/products`))
-//         .catch((error) => {
-//             console.log(error);
-//             res.status(404).render("404");
-//         });
-// })
+    res.redirect("/catalog");
+
+} catch (error) {
+        console.log(`error from del: ${error}`);
+        res.status(403).redirect("/catalog");
+}
+});
 
 
 
