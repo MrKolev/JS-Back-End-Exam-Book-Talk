@@ -12,17 +12,26 @@
 </head>
 
 <body>
-        <header class="header">
+    
+    {{#if error}}
+    <div>
+        <div class="errorContainer">
+            <p>{{error}}</p>
+        </div>
+    </div>
+    {{/if}}
+
+    <header class="header">
 
         <div class="header">
             <nav class="navbar">
                 <a href="/">Home</a>
                 <a href="/products/catalog">Catalog</a>
-               {{#if user}}
+                {{#if user}}
                 <a href="#">Profile</a>
                 <a href="/products/create">Create Review</a>
                 <a href="/auth/logout">Logout</a>
-               {{else}}
+                {{else}}
                 <a href="/auth/login">Login</a>
                 <a href="/auth/register">Register</a>
                 {{/if}}
@@ -31,7 +40,7 @@
 
     </header>
 
-{{{ body }}}
+    {{{ body }}}
 </body>
 
 </html>

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { config } from "../config/config.js";
+import { productsServer } from '../services/productService.js';
 const { verify } = jwt;
 
 
@@ -45,5 +46,12 @@ export function notLogin(req, res, next) {
             .render("404")
     }
 }
-
+export async function isOwner(req, res, next) {
+    let book = await productsServer.getById(req.params.bookId);
+    if (book.owner == req.user._id) {
+        next();
+    } else {
+        res.redirect(`/books/details/${req.params.bookId}`);
+    }
+}
 

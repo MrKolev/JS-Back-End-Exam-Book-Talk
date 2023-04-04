@@ -11,13 +11,13 @@ router.get('/logout', isLogin, (req, res) => {
 })
 
 router.get('/login', notLogin, (req, res) => {
-    res.render("login", {
+    res.render("user/login", {
         title: "Login"
     })
 })
 
 router.get('/register', notLogin, (req, res) => {
-    res.render("register", {
+    res.render("user/register", {
         title: "Register",
     })
 
@@ -38,7 +38,7 @@ router.post('/login', notLogin, async (req, res) => {
         res.redirect("/")
 
     } catch (error) {
-        res.render("login", {
+        res.render("user/login", {
             title: "Login",
             error
         })
@@ -70,7 +70,7 @@ router.post('/register', notLogin, async (req, res) => {
 
     } catch (error) {
         error.message = error._message;
-        res.render("register", {
+        res.render("user/register", {
             title: "Register",
             error
 

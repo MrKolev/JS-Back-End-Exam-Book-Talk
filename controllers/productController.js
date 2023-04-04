@@ -1,14 +1,21 @@
 import { Router } from 'express';
 import { productsServer } from '../services/productService.js'
-import { isLogin } from '../middlewares/auth.js';
+import { isLogin, isOwner } from '../middlewares/auth.js';
 
 const router = Router();
 
-router.get("/", (req, res) => {
-    res.render("home", {
-        title: "Home",
-    });
-})
+function getErrorMessage(error) {
+    let errorsArr = Object.keys(error.errors);
+
+    if (errorsArr.length > 0) {
+        return error.errors[errorsArr[0]];
+    } else {
+        return error.message
+    }
+
+}
+
+router.get("/", (req, res) => res.render("home", { title: "Home" }));
 
 router.get("/catalog", (req, res) => {
     productsServer.getAllfromCatalog()
@@ -17,103 +24,63 @@ router.get("/catalog", (req, res) => {
                 books
             })
         })
-})
-
-router.get("/create", isLogin, (req, res) => {
-    res.render("create", {
-        title: "Create"
-    })
-})
-
-router.get("/read/:productId", isLogin, async (req, res) => {
-    const userId = req.user._id;
-    const bookId = req.params.productId;
-
-    await productsServer.addWishingList(bookId, userId);
-    res.redirect("/details/" + bookId);
-
-})
-
-router.get("/edit/:productId", isLogin, async (req, res) => {
-    console.log(req.params.productId);
-    let products = await productsServer.getById(req.params.productId);
-    res.render("edit", {
-        title: "Edit",
-        products
-    });
-})
-
-router.get("/details/:productId", async (req, res) => {
-    const productId = req.params.productId;
-    try {
-        let products = await productsServer.getById(productId);
-
-        if (req.user) {
-            const userId = req.user._id;
-            products.isOwner = await productsServer.isOwner(userId, productId);
-            products.showWishBtn = await productsServer.bookIsNotInWishList(userId, productId);
-        }
-
-        res.render("details", {
-            title: "Details",
-            products
-        });
-    } catch (error) {
-        console.log(`details err : ${error}`);
-    }
-
-})
-
-router.get("/delete/:productId", isLogin, async (req, res) => {
-    try {
-        const productId = req.params.productId;
-        const userId = req.user._id;
-        if(productsServer.isOwner(userId,productId)){
-            await productsServer.deleteOneProduct(productId);
-        }
-
-    res.redirect("/catalog");
-
-} catch (error) {
-        console.log(`error from del: ${error}`);
-        res.status(403).redirect("/catalog");
-}
 });
 
-router.post("/create", isLogin, async (req, res) => {
-    const { title, author, genre, stars, image, bookReview } = req.body;
+router.get("/details/:bookId", async (req, res) => {
     try {
-        if (!title || !author || !genre || !stars || !image || !bookReview) {
-            throw { message: "Please fill in all fields." };
-        }
+        let book = await productsServer.getById(req.params.bookId);
 
-        await productsServer.create({
-            title,
-            author,
-            image,
-            bookReview,
-            genre,
-            stars
-        }, req.user._id);
-        res.redirect("/catalog")
+        const bookData = book.toObject();
+        const isOwner = bookData.owner == req.user?._id;
+        const wished = book.getWished();
+        const isWished = req.user && wished.some(c => c._id == req.user?._id);
+
+        res.render("books/details", { ...bookData, isOwner, isWished });
     } catch (error) {
-        error.message = error._message
-        res.render("create", {
-            title: "Create",
-            error
-        })
-        
+        console.log(`details err : ${error}`);
+        res.status(500).render("home", { title: "Home", error: getErrorMessage(error) });
     }
-})
+});
+
+router.get("/create", isLogin, (req, res) => res.render("books/create", { title: "Create" }));
+
+router.post("/create", isLogin, async (req, res) => {
+    try {
+        await productsServer.create(
+            {
+                ...req.body,
+                owner: req.user._id
+            }
+        );
+        res.redirect("/catalog");
+    } catch (error) {
+        res.render('books/create', { x: req.body, error: getErrorMessage(error) });
+    }
+});
+
+router.get("/edit/:productId", isLogin, (req, res) => {
+    productsServer.getById(req.params.productId)
+        .then((book) => { res.render("books/edit", { book }) })
+        .catch((error) => { res.status(500).render("home", { title: "Home", error: getErrorMessage(error) }); })
+});
 
 router.post("/edit/:productId", isLogin, (req, res) => {
-    console.log("OK");
     productsServer.updateOne(req.params.productId, req.body)
-        .then(() => res.redirect("/details/" + req.params.productId))
-        .catch((error) => {
-            console.log(error);
-            res.status(500).render("500");
-        });
-})
+        .then((book) => res.redirect("details/" + book._id))
+        .catch((error) => res.render('books/edit', { ...req.body, error: getErrorMessage(error) }));
+});
+
+router.get("/delete/:bookId", isLogin, isOwner, (req, res) => {
+    productsServer.deleteOneProduct(req.params.bookId)
+        .then(() => { res.redirect("/catalog") })
+        .catch((error) => {res.status(500).render("home", { title: "Home", error: getErrorMessage(error) })})
+});
+
+router.get("/wish/:bookId", isLogin, async (req, res) => {
+    let book = await productsServer.getById(req.params.bookId);
+    book.wishingList.push(req.user._id);
+    await book.save();
+    res.redirect("/details/" + book._id);
+});
 
 export { router as productController };

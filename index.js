@@ -15,4 +15,4 @@ app.use(routers);
 app.use(errorHandler);
 
 
-app.listen(config.PORT, ()=> console.log(`Server is running on port:${config.PORT}...`));
+app.listen(config.PORT, ()=> console.log(`The app is running on http://localhost:${config.PORT}`));

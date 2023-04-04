@@ -33,20 +33,28 @@ const bookSchema = new Schema({
         min: 1,
         max: 5
     },
-    wishingList: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }],
-    owner: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }]
+    wishingList: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "User"
+        }
+    ],
+    owner: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "User"
+        }
+    ]
 });
 
+bookSchema.method('getWished', function () {
+    return this.wishingList.map(x => x._id);
+})
 
- const Book = model('Books', bookSchema);
 
- export default Book;
+const Book = model('Books', bookSchema);
+
+export default Book;
 
 
 
