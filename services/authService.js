@@ -1,5 +1,5 @@
 import { config } from "../config/config.js"
-import { User } from "../models/uresrs.js"
+import  User  from "../models/uresrs.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const { sign } = jwt;
@@ -44,9 +44,14 @@ async function register(username, password, email) {
     return token(user.save());
 }
 
+async function getUser(id){
+    return await User.findById(id);
+}
+
 export const authService = {
     register,
     login,
     userCheck,
-    emailCheck
+    emailCheck,
+    getUser
 }

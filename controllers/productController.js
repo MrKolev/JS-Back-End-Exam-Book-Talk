@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { productsServer } from '../services/productService.js'
 import { isLogin } from '../middlewares/auth.js';
+import { authService } from '../services/authService.js';
 
 const router = Router();
 
@@ -25,20 +26,18 @@ router.get("/create", isLogin, (req, res) => {
     })
 })
 
-// router.get("/:productId/attach", isLogin, async (req, res) => {
-//     let product = await productsServer.getById(req.params.productId);
-//     let accessories = await accessoriesServer.getNameAndId(product.accessories);
+router.get("/read/:productId", isLogin, async (req, res) => {
+    const userId = req.user._id;
+    const bookId = req.params.productId;
 
-//     res.render("attachAccessory", {
-//         product,
-//         accessories,
-//         title: "Attach accessory"
-//     });
-// })
+    await productsServer.addWishingList(bookId, userId);
+    res.redirect("/details/" + bookId);
+
+})
 
 router.get("/edit/:productId", isLogin, async (req, res) => {
     console.log(req.params.productId);
-    let products= await productsServer.getById(req.params.productId);
+    let products = await productsServer.getById(req.params.productId);
     res.render("edit", {
         title: "Edit",
         products
@@ -46,28 +45,23 @@ router.get("/edit/:productId", isLogin, async (req, res) => {
 })
 
 router.get("/details/:productId", async (req, res) => {
-    let products = await productsServer.getById(req.params.productId);
+    const productId = req.params.productId;
+    try {
+        let products = await productsServer.getById(productId);
 
-    let userId = null;
+        if (req.user) {
+            const userId = req.user._id;
+            products.isOwner = await productsServer.isOwner(userId, productId);
+            products.showWishBtn = await productsServer.bookIsNotInWishList(userId, productId);
+        }
 
-    if (req.user) {
-        userId = req.user._id;
+        res.render("details", {
+            title: "Details",
+            products
+        });
+    } catch (error) {
+        console.log(`details err : ${error}`);
     }
-
-    if (products.owner.toString() == userId) {
-        products.isOwner = true;
-    }
-
-    if(products.wishingList.includes(userId)){
-        products.isWished = true;
-    }else{
-        products.isWished = false;
-    }
-
-    res.render("details", {
-        title: "Details",
-        products,
-    });
 
 })
 
@@ -90,15 +84,7 @@ router.get("/details/:productId", async (req, res) => {
 //         });
 // })
 
-// router.post("/:productId/attach", isLogin, async (req, res) => {
-//     productsServer.attachAccessory(req.params.productId, req.body)
-//         .then((product) =>
-//             res.redirect(`/products/details/${req.params.productId}`))
-//         .catch((error) => {
-//             console.log(error);
-//             res.status(500).render("500");
-//         });
-// })
+
 
 router.post("/create", isLogin, async (req, res) => {
     const { title, author, genre, stars, image, bookReview } = req.body;
@@ -113,9 +99,8 @@ router.post("/create", isLogin, async (req, res) => {
             image,
             bookReview,
             genre,
-            stars,
-            owner: req.user._id
-        });
+            stars
+        }, req.user._id);
         res.redirect("/catalog")
     } catch (error) {
         console.log(error);
@@ -123,7 +108,7 @@ router.post("/create", isLogin, async (req, res) => {
     }
 })
 
-router.post("/edit/:productId",isLogin, (req, res) => {
+router.post("/edit/:productId", isLogin, (req, res) => {
     console.log("OK");
     productsServer.updateOne(req.params.productId, req.body)
         .then(() => res.redirect("/details/" + req.params.productId))
