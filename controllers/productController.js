@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { productsServer } from '../services/productService.js'
 import { isLogin } from '../middlewares/auth.js';
-import { authService } from '../services/authService.js';
 
 const router = Router();
 
@@ -81,8 +80,6 @@ router.get("/delete/:productId", isLogin, async (req, res) => {
 }
 });
 
-
-
 router.post("/create", isLogin, async (req, res) => {
     const { title, author, genre, stars, image, bookReview } = req.body;
     try {
@@ -100,8 +97,12 @@ router.post("/create", isLogin, async (req, res) => {
         }, req.user._id);
         res.redirect("/catalog")
     } catch (error) {
-        console.log(error);
-        res.status(404).render("404");
+        error.message = error._message
+        res.render("create", {
+            title: "Create",
+            error
+        })
+        
     }
 })
 

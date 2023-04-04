@@ -4,14 +4,17 @@ import { model, Schema } from "mongoose";
     username: {
         type: String,
         required: true,
+        minLength: 4,
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        minLength: 3,
     },
     email: {
         type: String,
         required: true,
+        minLength: 10,
     },
 });
 

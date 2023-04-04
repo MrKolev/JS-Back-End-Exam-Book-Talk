@@ -29,7 +29,9 @@ router.post('/login', notLogin, async (req, res) => {
 
         if (!email || !password) throw { message: "Fill in all the fields." }
 
-        let token = await authService.login(email, password);
+        const user = await authService.login(email, password);
+
+        const token = await authService.createToken(user);
 
         res.cookie(config.TOKEN_NAME, token);
 
@@ -58,13 +60,16 @@ router.post('/register', notLogin, async (req, res) => {
         await authService.userCheck(username);
         await authService.emailCheck(email);
 
-        let token = await authService.register(username, password, email);
+        const user = await authService.register(username, password, email);
+
+        const token = authService.createToken(user);
 
         res.cookie(config.TOKEN_NAME, token);
 
         res.redirect("/");
 
     } catch (error) {
+        error.message = error._message;
         res.render("register", {
             title: "Register",
             error

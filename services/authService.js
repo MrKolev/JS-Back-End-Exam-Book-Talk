@@ -1,23 +1,29 @@
 import { config } from "../config/config.js"
-import  User  from "../models/uresrs.js"
+import User from "../models/uresrs.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const { sign } = jwt;
 
 
 
-const token = (user) => {
-    let options = { _id: user._id,
-    name: user.username}
-    
+function createToken(user){
+    const options = {
+        _id: user._id,
+        name: user.username
+    }
+
     return sign(options, config.SECRET_TOKEN)
 }
 
 async function login(email, password) {
-    const user = await User.findOne({ email });
-    if (!user) throw { message: "Wrong password or username!" }
-    if (!(await bcrypt.compare(password, user.password))) throw { message: "Wrong password or username!" }
-    return token(user);
+    try {
+        const user = await User.findOne({ email });
+        if (!user) throw { message: "Wrong password or username!" }
+        if (!(await bcrypt.compare(password, user.password))) throw { message: "Wrong password or username!" }
+        return user;
+    } catch (error) {
+        throw { message: error.message }
+    }
 }
 
 async function userCheck(username) {
@@ -31,20 +37,23 @@ async function emailCheck(email) {
 }
 
 async function register(username, password, email) {
+    try {
+        let salt = await bcrypt.genSalt(config.SALT_ROUNDS);
+        let hash = await bcrypt.hash(password, salt);
 
-    let salt = await bcrypt.genSalt(config.SALT_ROUNDS);
-    let hash = await bcrypt.hash(password, salt);
-
-    const user = new User({
-        username,
-        password: hash,
-        email,
-    })
-
-    return token(user.save());
+        const user = new User({
+            username,
+            password: hash,
+            email,
+        })
+        return user.save()
+    } catch (error) {
+        console.log("error.message66666666666666666666666666");
+        return error
+    }
 }
 
-async function getUser(id){
+async function getUser(id) {
     return await User.findById(id);
 }
 
@@ -53,5 +62,6 @@ export const authService = {
     login,
     userCheck,
     emailCheck,
-    getUser
+    getUser,
+    createToken
 }

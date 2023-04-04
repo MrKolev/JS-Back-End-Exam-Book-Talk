@@ -6,24 +6,18 @@ function create(data, userId) {
     cube.owner.push(userId);
     return cube.save();
 }
-
-
 async function getById(_id) {
     return await Book.findOne({ _id }).lean();
 }
-
 async function getAllfromCatalog() {
     return await Book.find({}, { title: 1, image: 1, _id: 1, }).lean();
 }
-
 async function updateOne(productId, data) {
     return Book.updateOne({ _id: productId }, data)
 }
-
 async function deleteOneProduct(productId) {
     return Book.deleteOne({ _id: productId })
 }
-
 async function isOwner(userId, id) {
     try {
         let product = await Book.findOne({ _id: id }, {owner:1 }).populate([{ path: "User", strictPopulate: false }]);
@@ -52,7 +46,6 @@ async function bookIsNotInWishList(userId, id) {
     }
 
 }
-
 async function addWishingList(bookId, userId) {
     try {
         const book = await Book.findOne({ _id: bookId });
@@ -63,7 +56,6 @@ async function addWishingList(bookId, userId) {
         console.log(error.message);
     }
 }
-
 
 export const productsServer = {
     create,
