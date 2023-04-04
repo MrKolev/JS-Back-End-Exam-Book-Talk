@@ -1,15 +1,8 @@
-{{#if error}}
-<div class="errorContainer">
-    <p>{{error.message}}</p>
-</div>
-{{/if}}
-
 <section class="login-form-container">
-
     <form action="/auth/login" method="POST">
         <h3>Login</h3>
         <label>Email</label>
-        <input type="email" name="email" class="box" id="">
+        <input type="email" name="email" class="box" id="" value="{{email}}">
         <label>Password</label>
         <input type="password" name="password" class="box" id="">
         <input type="submit" value="Login" class="btn">

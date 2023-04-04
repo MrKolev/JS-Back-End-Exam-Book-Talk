@@ -1,19 +1,10 @@
-<!-- In case of error, you should display div with class "errorContainer" -->
-<!-- You can choose to display the first error or all of them (error message/s in your opinion) -->
-{{#if error}}
-<div class="errorContainer">
-    <p>{{error.message}}</p>
-</div>
-{{/if}}
-
 <section class="register-form-container">
-
     <form action="/auth/register" method="POST">
         <h3>Register</h3>
         <label>Email</label>
-        <input type="email" name="email" class="box" id="">
+        <input type="email" name="email" class="box" id="" value="{{email}}" >
         <label>Username</label>
-        <input type="text" name="username" class="box" id="">
+        <input type="text" name="username" class="box" id="" value="{{username}}">
         <label>Password</label>
         <input type="password" name="password" class="box" id="">
         <label>Confirm Password</label>

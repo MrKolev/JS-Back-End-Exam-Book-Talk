@@ -4,7 +4,7 @@ import { isLogin, isOwner } from '../middlewares/auth.js';
 
 const router = Router();
 
-function getErrorMessage(error) {
+export function getErrorMessage(error) {
     let errorsArr = Object.keys(error.errors);
 
     if (errorsArr.length > 0) {
@@ -73,14 +73,18 @@ router.post("/edit/:productId", isLogin, (req, res) => {
 router.get("/delete/:bookId", isLogin, isOwner, (req, res) => {
     productsServer.deleteOneProduct(req.params.bookId)
         .then(() => { res.redirect("/catalog") })
-        .catch((error) => {res.status(500).render("home", { title: "Home", error: getErrorMessage(error) })})
+        .catch((error) => { res.status(500).render("home", { title: "Home", error: getErrorMessage(error) }) })
 });
 
 router.get("/wish/:bookId", isLogin, async (req, res) => {
-    let book = await productsServer.getById(req.params.bookId);
-    book.wishingList.push(req.user._id);
-    await book.save();
-    res.redirect("/details/" + book._id);
+    try {
+        let book = await productsServer.getById(req.params.bookId);
+        book.wishingList.push(req.user._id);
+        await book.save();
+        res.redirect("/details/" + book._id);
+    } catch (error) {
+        res.render("/details/" + book._id, { ...book, error: getErrorMessage(error) });
+    }
 });
 
 export { router as productController };
